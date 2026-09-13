@@ -1,0 +1,8 @@
+{
+  "name": "@veyra/ai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AI provider abstraction and validation for Veyra.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}
