@@ -1,3 +1,5 @@
-from app.domain.goal import GoalPriority, GoalStatus, MAX_TITLE_LENGTH, is_valid_title
+from app.domain.goal import GoalPriority, GoalStatus
+from app.domain.task import TaskPriority, TaskStatus
+from app.domain.proposal import ProposalStatus
 
-__all__ = ["GoalPriority", "GoalStatus", "MAX_TITLE_LENGTH", "is_valid_title"]
+__all__ = ["GoalPriority", "GoalStatus", "TaskPriority", "TaskStatus", "ProposalStatus"]

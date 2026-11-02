@@ -1,26 +1,25 @@
 # Development Setup
 
-How to run the web app and the API locally.
+How to run Veyra locally.
 
 ## Prerequisites
 
-- Node.js 20+ (plus npm)
-- Python 3.11+
-- (Optional) Docker, for the PostgreSQL database
+- Python 3.12+ (or 3.11+)
+- (Optional) Docker, for the local PostgreSQL database
+
+No Node.js, npm, or frontend build toolchains are required. The frontend is built with vanilla HTML, modern CSS, and ES Modules.
 
 ## Database
 
-The default `DATABASE_URL` points at a local PostgreSQL instance matching the
-Docker Compose service:
+The default `DATABASE_URL` points at a local PostgreSQL instance matching the Docker Compose service:
 
 ```bash
 docker compose up -d db
 ```
 
-If Docker is unavailable, you can point `DATABASE_URL` at any PostgreSQL you
-have access to (see Configuration below).
+If Docker is unavailable, the test suite runs completely independently against an in-memory SQLite database via pytest.
 
-### Applying migrations
+### Applying Migrations
 
 Run Alembic migrations from the API directory:
 
@@ -30,9 +29,14 @@ cd services/api
 # source .venv/bin/alembic upgrade head   # macOS / Linux
 ```
 
-The schema currently contains a single `goals` table.
+The database schema manages:
+- `goals`: Core user objectives and milestones
+- `tasks`: Goal-scoped actionable work items with priorities and time estimates
+- `plan_proposals`: Intermediate AI proposal artifacts awaiting user approval
 
-## API service
+## Running Veyra (Backend & Frontend)
+
+Because the frontend is served directly as static files by FastAPI at `/`, starting the backend runs the entire platform:
 
 ```bash
 cd services/api
@@ -40,59 +44,35 @@ python -m venv .venv
 .venv\Scripts\activate      # Windows
 # source .venv/bin/activate  # macOS / Linux
 pip install -e ".[dev]"
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8000
 ```
 
-Runs the FastAPI app at <http://localhost:8000>. Health check:
-<http://localhost:8000/health>.
+- Web Platform: <http://localhost:8000>
+- Health Check: <http://localhost:8000/health>
+- Interactive API Docs: <http://localhost:8000/docs>
 
 ### Configuration
 
 Copy `.env.example` to `.env` and adjust values. `.env` is ignored by git.
 The API reads:
 
-- `DATABASE_URL` — SQLAlchemy connection string (defaults to the local
-  `postgresql+psycopg://veyra:veyra@localhost:5432/veyra`).
-- `DEV_USER_ID` — the development user owning goals until real auth exists.
-- `CORS_ORIGINS` — comma-separated origins allowed to call the API.
+- `DATABASE_URL` — SQLAlchemy connection string (defaults to `postgresql+psycopg://veyra:veyra@localhost:5432/veyra`).
+- `DEV_USER_ID` — the development user identity (default `dev-user`).
+- `CORS_ORIGINS` — comma-separated origins allowed to call the API (default `http://localhost:8000,http://localhost:3000`).
 
-### Development user (no auth yet)
+### Development Identity Seam
 
-Authentication is not implemented. The API associates every request with a
-single development user, configured via `DEV_USER_ID` (default `dev-user`).
-For local testing you can override the identity per request with the
-`X-Dev-User-Id` header. This is a development-only seam; real authentication
-will replace it.
+Authentication is decoupled from authorization via a development seam. Every request is scoped to a user (`dev_user_id`), which can be overridden per request via the `X-Dev-User-Id` header for automated multi-tenant testing without mock auth services.
 
-### Tests
+### AI Provider Setup
 
-```bash
-pytest
-```
+Veyra V1 operates completely without external API keys. It defaults to `DevAIProvider`, a deterministic development provider that generates structured plan proposals for testing and development. Real external providers can be injected via the `AIProvider` protocol.
 
-Tests run against an in-memory SQLite database, so they do not require a
-running PostgreSQL instance.
-
-## Web app
+### Running Backend Tests
 
 ```bash
-cd apps/web
-npm install
-npm run dev
+cd services/api
+.venv\Scripts\pytest.exe -v
 ```
 
-Runs the Next.js dev server at <http://localhost:3000>. The Goals page is at
-<http://localhost:3000/goals>.
-
-### Configuration
-
-Copy `apps/web/.env.example` to `.env` to set `NEXT_PUBLIC_API_URL`
-(default `http://localhost:8000`).
-
-### Checks
-
-```bash
-npm run lint     # ESLint
-npm run build    # production build (includes type checking)
-npx tsc --noEmit # typecheck
-```
+Automated tests run against an isolated in-memory SQLite database using SQLAlchemy's `StaticPool`. No running PostgreSQL or external network connection is required.

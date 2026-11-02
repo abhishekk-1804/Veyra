@@ -7,24 +7,33 @@ on:
 
 jobs:
   web:
-    name: Web (lint / build)
+    name: Web (Static Frontend Verification)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      - name: Verify static frontend structure
+        run: |
+          test -f apps/web/index.html
+          test -f apps/web/css/base.css
+          test -f apps/web/css/layout.css
+          test -f apps/web/css/components.css
+          test -f apps/web/css/dashboard.css
+          test -f apps/web/css/goals.css
+          test -f apps/web/css/planner.css
+          test -f apps/web/css/execution.css
+          test -f apps/web/js/app.js
+          test -f apps/web/js/api.js
+          test -f apps/web/js/state.js
+          test -f apps/web/js/router.js
+          test -f apps/web/js/ui.js
+          test -f apps/web/js/dashboard.js
+          test -f apps/web/js/goals.js
+          test -f apps/web/js/planner.js
+          test -f apps/web/js/execution.js
+          echo "Static vanilla frontend files verified."
 
   api:
-    name: API (test)
+    name: API (Test Suite)
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -28,3 +28,11 @@ class GoalRepository:
             .order_by(Goal.created_at.desc(), Goal.id.asc())
         )
         return list(self._session.scalars(stmt).all())
+
+    def delete(self, user_id: str, goal_id: UUID) -> bool:
+        goal = self.get(user_id, goal_id)
+        if goal is None:
+            return False
+        self._session.delete(goal)
+        self._session.flush()
+        return True

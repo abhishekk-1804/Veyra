@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Veyra Web Frontend
 
-## Getting Started
+Vanilla HTML, CSS, and modern JavaScript (ES Modules) single-page execution platform interface.
 
-First, run the development server:
+## Architecture
+
+- **No Framework Overheads**: Pure vanilla web standard implementation. Strictly zero React, zero TypeScript compile step, zero node_modules required.
+- **Direct Backend Integration**: Mounted and served directly by the FastAPI backend at `/` or independently via any static HTTP web server.
+- **Modular Design**:
+  - `css/`: Modular stylesheets (`base.css`, `layout.css`, `components.css`, `dashboard.css`, `goals.css`, `planner.css`, `execution.css`).
+  - `js/`: ES Modules (`app.js`, `api.js`, `state.js`, `router.js`, `ui.js`, `dashboard.js`, `goals.js`, `planner.js`, `execution.js`).
+  - `index.html`: Shell mounting the responsive dark-themed workspace.
+
+## Core Workspaces
+
+1. **Dashboard (`#dashboard`)**: System stats, completion metrics, and transparent 4-stage lifecycle flow (`Intent -> Propose -> Decide -> Execute`).
+2. **Goals & Tasks (`#goals`)**: Master-detail workspace with progress tracking, task CRUD, status machine transitions, and priority tagging.
+3. **AI Planner (`#planner`)**: Bounded intent decomposition proposals with transparent review, approval, and rejection.
+4. **Execution Engine (`#execution`)**: Deterministic dispatch bounded by capacity windows, immediate focus spotlight, and reviewable replanning with explicit user control.
+
+## Running Locally
+
+Served automatically when launching the FastAPI backend:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd services/api
+uvicorn app.main:app --reload --port 8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Navigate to `http://localhost:8000`.

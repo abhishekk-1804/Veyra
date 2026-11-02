@@ -63,3 +63,15 @@ def update_goal(
     db.commit()
     db.refresh(goal)
     return GoalRead.model_validate(goal)
+
+
+@router.delete("/{goal_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_goal(
+    goal_id: UUID,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+) -> None:
+    deleted = GoalService(db).delete(user_id, goal_id)
+    if not deleted:
+        raise _not_found()
+    db.commit()

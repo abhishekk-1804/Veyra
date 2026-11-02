@@ -41,3 +41,6 @@ class GoalService:
             setattr(goal, field, value)
         self._session.flush()
         return goal
+
+    def delete(self, user_id: str, goal_id: UUID) -> bool:
+        return self._repo.delete(user_id, goal_id)

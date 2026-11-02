@@ -161,3 +161,28 @@ class TestOwnership:
             headers={"X-Dev-User-Id": "other-user"},
         )
         assert other_resp.status_code == 404
+
+    def test_delete_scoped_to_user(self, client: TestClient) -> None:
+        created = _create_goal(client).json()
+        other_resp = client.delete(
+            f"/goals/{created['id']}",
+            headers={"X-Dev-User-Id": "other-user"},
+        )
+        assert other_resp.status_code == 404
+        # Original user can still get the goal
+        assert client.get(f"/goals/{created['id']}").status_code == 200
+
+
+class TestDeleteGoal:
+    def test_delete_goal_success(self, client: TestClient) -> None:
+        created = _create_goal(client).json()
+        del_resp = client.delete(f"/goals/{created['id']}")
+        assert del_resp.status_code == 204
+        get_resp = client.get(f"/goals/{created['id']}")
+        assert get_resp.status_code == 404
+
+    def test_delete_nonexistent_goal_returns_404(self, client: TestClient) -> None:
+        from uuid import uuid4
+        fake_id = str(uuid4())
+        resp = client.delete(f"/goals/{fake_id}")
+        assert resp.status_code == 404
